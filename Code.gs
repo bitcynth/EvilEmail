@@ -2,7 +2,7 @@ function tagEmails() {
   var emailDomain = "email.cynthia.re";
   
   var threads = GmailApp.getInboxThreads();
-
+  
   // Tag for "To be processed"
   var tbpLabel = GmailApp.getUserLabelByName("EvilEmail/TBP");
   
@@ -23,7 +23,7 @@ function tagEmails() {
   var threads = tbpLabel.getThreads();
   for (var i in threads) {
     var messages = threads[i].getMessages();
-    var toHeader = messages[0].getTo();
+    var toHeader = messages[0].getHeader("Delivered-To");
     if (!(toHeader.toLowerCase() in mapAddrToTag)) {
       console.log("noping out of: \"" + threads[i].getFirstMessageSubject() + "\"");
       continue;
