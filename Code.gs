@@ -8,7 +8,7 @@ function tagEmails() {
   var mapAddrToTag = {};
   
   var sheet = SpreadsheetApp.getActiveSheet();
-  var cells = sheet.getRange('A2:D100');
+  var cells = sheet.getRange('A2:D1000');
   var cellRows = cells.getValues();
   for (var i in cellRows) {
     var key = String(cellRows[i][0]).toLowerCase();
