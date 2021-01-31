@@ -1,10 +1,9 @@
 function tagEmails() {
-  var emailDomain = "email.cynthia.re";
+  var emailDomain = "email.cynthia.re"; // The domain part of the email addresses
+  var labelPrefix = "EvilEmail/"; // Prefix for the labels
+  var tbpLabelName = labelPrefix + "TBP"; // Label for "To be processed"
   
-  var threads = GmailApp.getInboxThreads();
-  
-  // Tag for "To be processed"
-  var tbpLabel = GmailApp.getUserLabelByName("EvilEmail/TBP");
+  var tbpLabel = GmailApp.getUserLabelByName(tbpLabelName);
   
   var mapAddrToTag = {};
   
@@ -12,10 +11,13 @@ function tagEmails() {
   var cells = sheet.getRange('A2:D100');
   var cellRows = cells.getValues();
   for (var i in cellRows) {
-    if (cellRows[i][2].toLowerCase() != "yes") {
+    var key = String(cellRows[i][0]).toLowerCase();
+    var keyName = String(cellRows[i][1]);
+    var isActive = String(cellRows[i][2]).toLowerCase() === "yes";
+    if (!isActive) {
       continue;
     }
-    mapAddrToTag[cellRows[i][0] + '@' + emailDomain] = cellRows[i][1];
+    mapAddrToTag[key + '@' + emailDomain] = keyName;
   }
   
   console.log(mapAddrToTag);
@@ -23,12 +25,15 @@ function tagEmails() {
   var threads = tbpLabel.getThreads();
   for (var i in threads) {
     var messages = threads[i].getMessages();
-    var toHeader = messages[0].getHeader("Delivered-To");
-    if (!(toHeader.toLowerCase() in mapAddrToTag)) {
-      console.log("noping out of: \"" + threads[i].getFirstMessageSubject() + "\"");
+
+    var toAddr = messages[0].getHeader("X-Gm-Original-To").toLowerCase(); 
+    
+    if (!(toAddr in mapAddrToTag)) {
+      console.log("noop: \"" + threads[i].getFirstMessageSubject() + "\"");
       continue;
     }
-    var tagName = "EvilEmail/" + mapAddrToTag[toHeader];
+    
+    var tagName = labelPrefix + mapAddrToTag[toAddr];
     var tag = GmailApp.getUserLabelByName(tagName);
     if (tag == null) {
       tag = GmailApp.createLabel(tagName);
