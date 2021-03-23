@@ -33,11 +33,26 @@ function tagEmails() {
       continue;
     }
     
-    var tagName = labelPrefix + mapAddrToTag[toAddr];
+    var tagName = String(mapAddrToTag[toAddr]);
+    var prefixedTag = true;
+    if (tagName.charAt(0) === '/') {
+      prefixedTag = false;
+      tagName = tagName.substr(1);
+    } else {
+      tagName = labelPrefix + tagName;
+    }
+
     var tag = GmailApp.getUserLabelByName(tagName);
-    if (tag == null) {
+    if (tag == null && prefixedTag) {
       tag = GmailApp.createLabel(tagName);
     }
+
+    // If tag still doesn't exist, noop
+    if (tag == null) {
+      console.log("noop (no tag): \"" + threads[i].getFirstMessageSubject() + "\"");
+      continue;
+    }
+
     tag.addToThread(threads[i]);
     
     tbpLabel.removeFromThread(threads[i]);
