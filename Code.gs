@@ -37,7 +37,7 @@ function tagEmails() {
     var prefixedTag = true;
     if (tagName.charAt(0) === '/') {
       prefixedTag = false;
-      tagName = tagName.substr(1);
+      tagName = tagName.substring(1);
     } else {
       tagName = labelPrefix + tagName;
     }
